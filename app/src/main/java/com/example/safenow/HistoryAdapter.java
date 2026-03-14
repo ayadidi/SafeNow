@@ -7,7 +7,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.safenow.models.AlertEvent;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
@@ -20,6 +22,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Assure-toi que le fichier item_history.xml existe dans res/layout
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_history, parent, false);
         return new ViewHolder(view);
@@ -28,8 +31,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AlertEvent event = alertEvents.get(position);
-        holder.tvDate.setText(event.getDate());
-        holder.tvTime.setText(event.getHeure());
+
+        if (event.getTimestamp() != null) {
+            // Formater la Date en jour/mois/année
+            SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            holder.tvDate.setText(sdfDate.format(event.getTimestamp()));
+
+            // Formater la Date en Heure:Minute
+            SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            holder.tvTime.setText(sdfTime.format(event.getTimestamp()));
+        }
+
         holder.tvPosition.setText(event.getPosition());
     }
 

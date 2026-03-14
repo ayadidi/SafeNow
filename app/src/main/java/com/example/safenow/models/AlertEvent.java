@@ -1,17 +1,29 @@
 package com.example.safenow.models;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import java.util.Date;
+
+@Entity(tableName = "alertes")
 public class AlertEvent {
-    private String date;
-    private String heure;
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
+    private Date timestamp; // Contient Date + Heure
     private String position;
 
-    public AlertEvent(String date, String heure, String position) {
-        this.date = date;
-        this.heure = heure;
+    public AlertEvent() {} // Obligatoire pour Firebase
+
+    public AlertEvent(Date timestamp, String position) {
+        this.timestamp = timestamp;
         this.position = position;
     }
 
-    public String getDate() { return date; }
-    public String getHeure() { return heure; }
+    // Getters et Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public Date getTimestamp() { return timestamp; }
+    public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
     public String getPosition() { return position; }
+    public void setPosition(String position) { this.position = position; }
 }

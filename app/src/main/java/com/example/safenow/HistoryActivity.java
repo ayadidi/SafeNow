@@ -7,30 +7,37 @@ import com.example.safenow.databinding.ActivityHistoryBinding;
 import com.example.safenow.models.AlertEvent;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.EventListener;
+import androidx.annotation.Nullable;
 
 public class HistoryActivity extends AppCompatActivity {
-
     private ActivityHistoryBinding binding;
     private HistoryAdapter adapter;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialisation du View Binding pour activity_history.xml
         binding = ActivityHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Configuration du RecyclerView (Tâche : Afficher la liste des alertes)
+        db = FirebaseFirestore.getInstance();
         binding.rvHistory.setLayoutManager(new LinearLayoutManager(this));
 
-        // Simulation de données conforme au cahier des charges [cite: 192]
-        List<AlertEvent> alertList = new ArrayList<>();
-        alertList.add(new AlertEvent("14/03/2026", "10:30", "Lat: 30.41, Long: -8.87"));
-        alertList.add(new AlertEvent("12/03/2026", "15:45", "Lat: 30.42, Long: -8.85"));
-
-        // Liaison de l'adaptateur
-        adapter = new HistoryAdapter(alertList);
-        binding.rvHistory.setAdapter(adapter);
+        // Écouter la "table" Firebase en temps réel
+        db.collection("alerts")
+                .orderBy("timestamp", Query.Direction.DESCENDING) // Plus récent en haut
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) return;
+                    if (value != null) {
+                        List<AlertEvent> alertList = value.toObjects(AlertEvent.class);
+                        adapter = new HistoryAdapter(alertList);
+                        binding.rvHistory.setAdapter(adapter);
+                    }
+                });
     }
 }

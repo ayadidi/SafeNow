@@ -2,42 +2,66 @@ package com.example.safenow;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import com.example.safenow.databinding.ActivityMainBinding;
+import android.util.Log;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+// Pour getMessage(), assure-toi d'avoir importé l'exception dans le listener
+import com.example.safenow.database.AppDatabase;
+import com.example.safenow.databinding.ActivityMainBinding;
+import com.example.safenow.models.AlertEvent;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private FirebaseFirestore dbCloud; // Instance Firebase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialisation du View Binding (nécessite 'viewBinding true' dans build.gradle)
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // 1. Bouton SOS : Action immédiate [cite: 68, 104]
-        binding.btnSOS.setOnClickListener(v -> {
-            declencherSOS();
-        });
+        // Initialisation de Firebase
+        dbCloud = FirebaseFirestore.getInstance();
 
-        // 2. Navigation vers l'Historique (Correction de l'ID : btnHistory) [cite: 90, 176]
+        binding.btnSOS.setOnClickListener(v -> declencherSOS());
+
         binding.btnHistory.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
         });
 
-        // 3. Navigation vers la Simulation VR [cite: 94, 239]
         binding.btnVR.setOnClickListener(v -> {
             Toast.makeText(this, "Lancement de la simulation Unity...", Toast.LENGTH_SHORT).show();
-            // Logique pour lancer l'activité VR
         });
     }
 
     private void declencherSOS() {
-        // Selon le cahier des charges : Envoi SMS + Position GPS [cite: 69, 70]
-        Toast.makeText(this, "Alerte SOS envoyée avec succès !", Toast.LENGTH_LONG).show();
+        // Création de la date précise à l'instant T
+        Date momentActuel = new Date();
+        String currentPos = "Lat: 30.42, Long: -8.84"; // Position test
+
+        AlertEvent alerte = new AlertEvent(momentActuel, currentPos);
+
+        // 1. Sauvegarde SQLite (Local)
+        new Thread(() -> {
+            AppDatabase.getInstance(this).appDao().insertAlerte(alerte);
+        }).start();
+
+        // 2. Sauvegarde Firebase (Partage groupe)
+        dbCloud.collection("alerts")
+                .add(alerte)
+                .addOnSuccessListener(doc -> {
+                    Toast.makeText(this, "SOS partagé au groupe !", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> Log.e("SafeNow", "Erreur: " + e.getMessage()));
     }
 }
