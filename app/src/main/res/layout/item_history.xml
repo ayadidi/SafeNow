@@ -35,6 +35,13 @@
             android:text="Position GPS"
             android:textColor="#757575"
             android:layout_marginTop="4dp" />
+        <TextView
+            android:id="@+id/tvType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type"
+            android:textStyle="bold" />
+
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

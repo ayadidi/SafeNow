@@ -7,6 +7,8 @@ import com.example.safenow.databinding.ActivityHistoryBinding;
 import com.example.safenow.models.AlertEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.safenow.models.SOS;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -29,12 +31,14 @@ public class HistoryActivity extends AppCompatActivity {
         binding.rvHistory.setLayoutManager(new LinearLayoutManager(this));
 
         // Écouter la "table" Firebase en temps réel
+        // Dans HistoryActivity.java
         db.collection("alerts")
-                .orderBy("timestamp", Query.Direction.DESCENDING) // Plus récent en haut
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) return;
                     if (value != null) {
-                        List<AlertEvent> alertList = value.toObjects(AlertEvent.class);
+                        // Conversion vers la nouvelle classe SOS
+                        List<SOS> alertList = value.toObjects(SOS.class);
                         adapter = new HistoryAdapter(alertList);
                         binding.rvHistory.setAdapter(adapter);
                     }

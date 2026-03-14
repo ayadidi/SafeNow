@@ -6,23 +6,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.safenow.models.AlertEvent;
+import com.example.safenow.models.SOS; // Plus besoin d'AlertEvent
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
-    private List<AlertEvent> alertEvents;
+    // 1. La liste doit être de type SOS
+    private List<SOS> alertEvents;
 
-    public HistoryAdapter(List<AlertEvent> alertEvents) {
+    // 2. Le constructeur doit AUSSI recevoir une liste de SOS
+    public HistoryAdapter(List<SOS> alertEvents) {
         this.alertEvents = alertEvents;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Assure-toi que le fichier item_history.xml existe dans res/layout
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_history, parent, false);
         return new ViewHolder(view);
@@ -30,19 +32,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AlertEvent event = alertEvents.get(position);
+        SOS event = alertEvents.get(position);
 
         if (event.getTimestamp() != null) {
-            // Formater la Date en jour/mois/année
             SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             holder.tvDate.setText(sdfDate.format(event.getTimestamp()));
 
-            // Formater la Date en Heure:Minute
             SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
             holder.tvTime.setText(sdfTime.format(event.getTimestamp()));
         }
 
-        holder.tvPosition.setText(event.getPosition());
+        // 3. Vérifie que tvType est bien déclaré dans ton ViewHolder plus bas
+        holder.tvType.setText(event.getType());
+        holder.tvPosition.setText(event.getLocalisation());
     }
 
     @Override
@@ -51,12 +53,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDate, tvTime, tvPosition;
+        // Ajoute tvType ici pour correspondre au onBindViewHolder
+        TextView tvDate, tvTime, tvPosition, tvType;
+
         public ViewHolder(View itemView) {
             super(itemView);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvPosition = itemView.findViewById(R.id.tvPosition);
+            tvType = itemView.findViewById(R.id.tvType); // Assure-toi que cet ID existe dans item_history.xml
         }
     }
 }

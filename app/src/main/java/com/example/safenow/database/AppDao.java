@@ -4,17 +4,15 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import com.example.safenow.models.AlertEvent;
+import com.example.safenow.models.SOS;
+
 import java.util.List;
 
 @Dao
 public interface AppDao {
-
     @Insert
-    void insertAlerte(AlertEvent alerte);
+    void insertSOS(SOS sos);
 
-    @Query("SELECT * FROM alertes ORDER BY id DESC")
-    List<AlertEvent> getAllAlertes();
-
-    @Query("DELETE FROM alertes")
-    void deleteAll();
+    @Query("SELECT * FROM sos_table ORDER BY id DESC")
+    List<SOS> getAllSOS();
 }

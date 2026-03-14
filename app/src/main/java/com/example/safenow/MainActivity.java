@@ -6,22 +6,19 @@ import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-// Pour getMessage(), assure-toi d'avoir importé l'exception dans le listener
 import com.example.safenow.database.AppDatabase;
 import com.example.safenow.databinding.ActivityMainBinding;
-import com.example.safenow.models.AlertEvent;
+import com.example.safenow.models.ContactUrgence;
+import com.example.safenow.models.SOS;
+import com.example.safenow.models.Utilisateur;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private FirebaseFirestore dbCloud; // Instance Firebase
+    private FirebaseFirestore dbCloud;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +26,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Initialisation de Firebase
         dbCloud = FirebaseFirestore.getInstance();
+
+        // --- AUTOMATISATION : Création des tables au démarrage ---
+        synchroniserProfilEtContacts();
 
         binding.btnSOS.setOnClickListener(v -> declencherSOS());
 
@@ -44,24 +43,40 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void declencherSOS() {
-        // Création de la date précise à l'instant T
-        Date momentActuel = new Date();
-        String currentPos = "Lat: 30.42, Long: -8.84"; // Position test
+    /**
+     * Cette méthode crée automatiquement les tables 'users' et 'contacts'
+     * sur Firebase si elles n'existent pas encore.
+     */
+    private void synchroniserProfilEtContacts() {
+        // 1. Table Utilisateur (UML)
+        Utilisateur userActuel = new Utilisateur("Aya Didi", "aya.didi@gmail.com", "password123");
+        dbCloud.collection("users").document(userActuel.getEmail()).set(userActuel)
+                .addOnSuccessListener(aVoid -> Log.d("SafeNow", "Table 'users' synchronisée"));
 
-        AlertEvent alerte = new AlertEvent(momentActuel, currentPos);
+        // 2. Table Contact d'urgence (UML)
+        ContactUrgence contact1 = new ContactUrgence("Aziza", "0600000000");
+        dbCloud.collection("contacts").document("contact_aziza").set(contact1)
+                .addOnSuccessListener(aVoid -> Log.d("SafeNow", "Table 'contacts' synchronisée"));
+    }
+
+    private void declencherSOS() {
+        Date momentActuel = new Date();
+        String currentPos = "Lat: 30.42, Long: -8.84"; // Sera remplacé par le GPS
+
+        // Création de l'objet SOS selon ton UML
+        SOS alerte = new SOS("Message", currentPos, momentActuel);
 
         // 1. Sauvegarde SQLite (Local)
         new Thread(() -> {
-            AppDatabase.getInstance(this).appDao().insertAlerte(alerte);
+            AppDatabase.getInstance(this).appDao().insertSOS(alerte);
         }).start();
 
-        // 2. Sauvegarde Firebase (Partage groupe)
+        // 2. Sauvegarde Firebase (Table 'alerts' partagée automatiquement)
         dbCloud.collection("alerts")
                 .add(alerte)
                 .addOnSuccessListener(doc -> {
                     Toast.makeText(this, "SOS partagé au groupe !", Toast.LENGTH_SHORT).show();
                 })
-                .addOnFailureListener(e -> Log.e("SafeNow", "Erreur: " + e.getMessage()));
+                .addOnFailureListener(e -> Log.e("SafeNow", "Erreur Firebase: " + e.getMessage()));
     }
 }
