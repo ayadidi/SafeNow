@@ -36,6 +36,14 @@
             android:label="Historique des Alertes"
             android:exported="false" />
 
+        <activity
+            android:name=".ContactsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AddEditContactActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

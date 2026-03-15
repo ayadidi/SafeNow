@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
         binding.btnVR.setOnClickListener(v -> {
             Toast.makeText(this, "Lancement de la simulation Unity...", Toast.LENGTH_SHORT).show();
         });
+        binding.btnContacts.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ContactsActivity.class);
+            startActivity(intent);
+        });
     }
 
     /**
@@ -54,11 +58,10 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> Log.d("SafeNow", "Table 'users' synchronisée"));
 
         // 2. Table Contact d'urgence (UML)
-        ContactUrgence contact1 = new ContactUrgence("Aziza", "0600000000");
+        ContactUrgence contact1 = new ContactUrgence("Aziza", "0600000000", "Amie", "user_1");
         dbCloud.collection("contacts").document("contact_aziza").set(contact1)
                 .addOnSuccessListener(aVoid -> Log.d("SafeNow", "Table 'contacts' synchronisée"));
     }
-
     private void declencherSOS() {
         Date momentActuel = new Date();
         String currentPos = "Lat: 30.42, Long: -8.84"; // Sera remplacé par le GPS
