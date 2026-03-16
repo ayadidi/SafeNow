@@ -12,7 +12,7 @@ import com.example.safenow.models.ContactUrgence;
 
 // 2. On met à jour la liste des entités avec SOS.class
 // 3. On augmente la version à 2 car le schéma a changé
-@Database(entities = {SOS.class, Utilisateur.class, ContactUrgence.class}, version = 2)
+@Database(entities = {SOS.class, Utilisateur.class, ContactUrgence.class}, version = 3)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
