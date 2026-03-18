@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="sos_red">#FF0000</color>
     <color name="nav_gray">#F5F5F5</color>
+    <color name="emergency_red">#D32F2F</color>
 </resources>
