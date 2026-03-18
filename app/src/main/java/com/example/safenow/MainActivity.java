@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         requestPermissions();
 
         // Automatisation : Création des tables au démarrage (Firebase)
-        synchroniserProfilEtContacts();
+        //synchroniserProfilEtContacts();
 
         // --- ACTIONS DES BOUTONS ---
 
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void envoyerSmsATousLesContacts(String message) {
         // On récupère les contacts depuis Firestore (Table 'contacts' de tes collègues)
-        dbCloud.collection("ContactUrgence")
+        dbCloud.collection("contacts")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
