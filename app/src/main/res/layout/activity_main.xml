@@ -1,69 +1,100 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="#FAF2F2"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SafeNow - Assistant de Sécurité"
-        android:textColor="#FFFFFF"
-        android:textSize="22sp"
+        android:layout_marginTop="24dp"
+        android:text="SafeNow"
+        android:textColor="#B71C1C"
+        android:textSize="32sp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Votre Assistant de Sécurité"
+        android:textColor="#7F0000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSOS"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:layout_centerInParent="true"
-        android:background="@drawable/sos_circle"
-        app:backgroundTint="@null"
         android:text="SOS"
         android:textColor="#FFFFFF"
-        android:textSize="40sp"
-        android:elevation="12dp" />
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:backgroundTint="#E53935"
+        app:cornerRadius="125dp"
+        app:elevation="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle" />
 
     <LinearLayout
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
         android:orientation="horizontal"
-        android:weightSum="3">
+        android:weightSum="3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnHistory"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="#FF0000"
             android:text="Historique"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:backgroundTint="#D32F2F"
+            app:cornerRadius="12dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVR"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginHorizontal="4dp"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:backgroundTint="#FF0000"
-            android:text="Simulation VR"
-            android:textColor="#FFFFFF" />
+            android:text="VR"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            app:backgroundTint="#D32F2F"
+            app:cornerRadius="12dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnContacts"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#FF0000"
             android:text="Contacts"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:backgroundTint="#D32F2F"
+            app:cornerRadius="12dp" />
+
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
