@@ -21,7 +21,7 @@ public interface AppDao {
     List<SOS> getAllSOS();
 
     @Insert
-    void insertContact(ContactUrgence contact);
+    long insertContact(ContactUrgence contact);
 
     @Update
     void updateContact(ContactUrgence contact);

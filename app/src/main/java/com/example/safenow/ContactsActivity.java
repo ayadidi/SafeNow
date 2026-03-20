@@ -3,6 +3,7 @@ package com.example.safenow;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.safenow.database.AppDatabase;
 import com.example.safenow.models.ContactUrgence;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class ContactsActivity extends AppCompatActivity {
     private TextView tvContactCount;
 
     private EmergencyContactAdapter adapter;
+    private FirebaseFirestore dbCloud;
 
     private final String currentUserId = "user_1";
 
@@ -44,6 +47,8 @@ public class ContactsActivity extends AppCompatActivity {
         recyclerContacts = findViewById(R.id.recyclerContacts);
         fabAddContact = findViewById(R.id.fabAddContact);
         tvContactCount = findViewById(R.id.tvContactCount);
+
+        dbCloud = FirebaseFirestore.getInstance();
 
         recyclerContacts.setLayoutManager(new LinearLayoutManager(this));
 
@@ -89,13 +94,35 @@ public class ContactsActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Supprimer le contact")
                 .setMessage("Voulez-vous vraiment supprimer " + contact.getNom_contact() + " ?")
-                .setPositiveButton("Oui", (dialog, which) -> {
-                    new Thread(() -> {
-                        AppDatabase.getInstance(this).appDao().deleteContact(contact);
-                        runOnUiThread(this::loadContacts);
-                    }).start();
-                })
+                .setPositiveButton("Oui", (dialog, which) -> deleteContact(contact))
                 .setNegativeButton("Annuler", null)
                 .show();
+    }
+
+    private void deleteContact(ContactUrgence contact) {
+        new Thread(() -> {
+            try {
+                // 1. Supprimer en local avec Room
+                AppDatabase.getInstance(this).appDao().deleteContact(contact);
+
+                // 2. Supprimer dans Firestore avec le même ID
+                dbCloud.collection("contacts")
+                        .document(String.valueOf(contact.getId()))
+                        .delete()
+                        .addOnSuccessListener(unused -> runOnUiThread(() -> {
+                            Toast.makeText(this, "Contact supprimé avec succès", Toast.LENGTH_SHORT).show();
+                            loadContacts();
+                        }))
+                        .addOnFailureListener(e -> runOnUiThread(() -> {
+                            Toast.makeText(this, "Supprimé localement, mais erreur Firestore : " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            loadContacts();
+                        }));
+
+            } catch (Exception e) {
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Erreur lors de la suppression : " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
     }
 }

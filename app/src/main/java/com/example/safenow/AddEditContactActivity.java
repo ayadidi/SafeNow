@@ -45,6 +45,7 @@ public class AddEditContactActivity extends AppCompatActivity {
         if (contactId != -1) {
             new Thread(() -> {
                 existingContact = AppDatabase.getInstance(this).appDao().getContactById(contactId);
+
                 runOnUiThread(() -> {
                     if (existingContact != null) {
                         fillForm(existingContact);
@@ -89,32 +90,47 @@ public class AddEditContactActivity extends AppCompatActivity {
         }
 
         new Thread(() -> {
-            if (existingContact == null) {
-                ContactUrgence newContact = new ContactUrgence(name, phone, relationship, currentUserId);
-                AppDatabase.getInstance(this).appDao().insertContact(newContact);
+            try {
+                if (existingContact == null) {
+                    ContactUrgence newContact = new ContactUrgence(name, phone, relationship, currentUserId);
 
-                dbCloud.collection("contacts").add(newContact);
+                    // 1) Insertion Room
+                    long generatedId = AppDatabase.getInstance(this).appDao().insertContact(newContact);
+                    newContact.setId((int) generatedId);
 
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "Contact ajouté avec succès", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
-            } else {
-                existingContact.setNom_contact(name);
-                existingContact.setNumero_contact(phone);
-                existingContact.setRelation_contact(relationship);
-                existingContact.setUserId(currentUserId);
+                    // 2) Sauvegarde Firestore avec le MÊME ID
+                    dbCloud.collection("contacts")
+                            .document(String.valueOf(newContact.getId()))
+                            .set(newContact);
 
-                AppDatabase.getInstance(this).appDao().updateContact(existingContact);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Contact ajouté avec succès", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
 
-                dbCloud.collection("contacts")
-                        .document(String.valueOf(existingContact.getId()))
-                        .set(existingContact);
+                } else {
+                    existingContact.setNom_contact(name);
+                    existingContact.setNumero_contact(phone);
+                    existingContact.setRelation_contact(relationship);
+                    existingContact.setUserId(currentUserId);
 
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "Contact modifié avec succès", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
+                    // 1) Mise à jour Room
+                    AppDatabase.getInstance(this).appDao().updateContact(existingContact);
+
+                    // 2) Mise à jour Firestore avec le MÊME ID
+                    dbCloud.collection("contacts")
+                            .document(String.valueOf(existingContact.getId()))
+                            .set(existingContact);
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Contact modifié avec succès", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                }
+            } catch (Exception e) {
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
             }
         }).start();
     }
